@@ -6,7 +6,7 @@ This repository is the source for `github.com/ozalpslan`'s profile README. It mu
 
 `assets/glasshouse-mark.svg` preserves the silhouette of the GlassHouse logo supplied for this profile. The brand artwork belongs to GlassHouse. The README identifies this as Alper's personal profile and states his internship role.
 
-The unframed, transparent header places the **Linux & DevOps** introduction on the left and a smaller GH logo at the upper right. The mobile version uses shorter text lines and a smaller mark. The toolbox, yearly graph and links align with the introduction below it. Introductory copy is generated in `header()` in `scripts/profile.py`; keep the README image's alternative text in sync when editing it.
+The unframed, transparent header places **Alper Özarslan**, the **Linux & DevOps Platform Intern** title and a short introduction on the left, with the GH logo at the upper right. The mobile version uses shorter text lines and a smaller mark. The toolbox, yearly graph and links align with the introduction below it. Introductory copy is generated in `header()` in `scripts/profile.py`; keep the README image's alternative text in sync when editing it.
 
 The logo uses cyan `#00B2EF`, magenta `#ED0090` and yellow `#F8EE02`. Its letters and arc positions stay fixed. Each arc holds its color for 0.55 seconds, then transitions for 0.45 seconds. One cycle takes 3 seconds. Light, dark, animated and static headers are generated together. The README selects the static version for reduced-motion preferences.
 

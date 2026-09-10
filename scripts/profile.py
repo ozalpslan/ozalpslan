@@ -67,34 +67,31 @@ def header(theme: str, animated=True, width=840) -> str:
             frames.append(f".mark-{name}{{animation:{name} 3s ease-in-out infinite}}")
         animation = "<style>" + "\n".join(frames) + "\n@media(prefers-reduced-motion:reduce){.mark-outer,.mark-middle,.mark-inner{animation:none}}</style>"
     compact = width < 600
-    scale = .205 if compact else .34
-    logo_x = width - (101 if compact else 168)
+    scale = .24 if compact else .40
+    logo_x = width - (117 if compact else 196)
     content = f'{animation}<g transform="translate({logo_x} 8) scale({scale})">{"".join(pieces)}</g>'
     content += '<g font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif">'
-    content += label(0, 42, "Linux & DevOps", colors["text"], 32 if compact else 34, font_weight="650")
+    content += label(0, 42, "Alper Özarslan", colors["text"], 32 if compact else 34, font_weight="650")
     if compact:
         lines = [
-            (78, "From hands-on labs", 19, "text"),
-            (102, "to reliable systems.", 19, "text"),
-            (148, "I build Linux and Kubernetes environments,", 17, "muted"),
-            (173, "automate infrastructure, and connect CI/CD,", 17, "muted"),
-            (198, "GitOps, and observability.", 17, "muted"),
-            (244, "Platforms Intern @ GlassHouse", 15, "text"),
-            (268, "Istanbul, Türkiye", 14, "muted"),
+            (78, "Linux & DevOps Platform Intern", 18, "text"),
+            (105, "GlassHouse · Istanbul, Türkiye", 14, "muted"),
+            (151, "I work with Linux and Kubernetes.", 17, "text"),
+            (179, "This is where I keep my labs,", 17, "muted"),
+            (204, "scripts, and notes.", 17, "muted"),
         ]
     else:
         lines = [
-            (79, "From hands-on labs to reliable systems.", 19, "text"),
-            (125, "I build Linux and Kubernetes environments, automate infrastructure,", 16, "muted"),
-            (150, "and connect CI/CD, GitOps, and observability.", 16, "muted"),
-            (196, "Platforms Intern @ GlassHouse · Istanbul, Türkiye", 14, "muted"),
+            (79, "Linux & DevOps Platform Intern", 20, "text"),
+            (107, "GlassHouse · Istanbul, Türkiye", 14, "muted"),
+            (153, "I work with Linux and Kubernetes.", 17, "text"),
+            (180, "This is where I keep my labs, scripts, and notes.", 17, "muted"),
         ]
     content += "".join(label(0, y, text, colors[color], size) for y, text, size, color in lines) + "</g>"
-    description = ("Linux & DevOps. From hands-on labs to reliable systems. "
-                   "I build Linux and Kubernetes environments, automate infrastructure, and connect CI/CD, GitOps, and observability. "
-                   "Platforms Intern at GlassHouse, Istanbul, Türkiye. "
-                   "A small GH logo sits at the upper right. Its arcs exchange colors every second in a three-second loop; reduced motion keeps them still.")
-    return svg("GlassHouse · Linux & DevOps", description, content, 284 if compact else 216, width)
+    description = ("Alper Özarslan. Linux & DevOps Platform Intern at GlassHouse, Istanbul, Türkiye. "
+                   "I work with Linux and Kubernetes. This is where I keep my labs, scripts, and notes. "
+                   "The GH logo sits at the upper right. Its arcs exchange colors every second in a three-second loop; reduced motion keeps them still.")
+    return svg("Alper Özarslan · Linux & DevOps", description, content, 232 if compact else 216, width)
 
 
 def normalize_days(entries):

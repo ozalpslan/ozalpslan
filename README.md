@@ -7,7 +7,7 @@
   <source media="(prefers-color-scheme: dark) and (prefers-reduced-motion: reduce)" srcset="assets/header-dark-static.svg">
   <source media="(prefers-color-scheme: light) and (prefers-reduced-motion: reduce)" srcset="assets/header-light-static.svg">
   <source media="(prefers-color-scheme: dark)" srcset="assets/header-dark.svg">
-  <img src="assets/header-light.svg" width="840" alt="Linux & DevOps. From hands-on labs to reliable systems. I build Linux and Kubernetes environments, automate infrastructure, and connect CI/CD, GitOps, and observability. Platforms Intern at GlassHouse, Istanbul, Türkiye. A small animated GH logo sits at the upper right.">
+  <img src="assets/header-light.svg" width="840" alt="Alper Özarslan. Linux & DevOps Platform Intern at GlassHouse, Istanbul, Türkiye. I work with Linux and Kubernetes. This is where I keep my labs, scripts, and notes. An animated GH logo sits at the upper right.">
 </picture>
 </p>
 
