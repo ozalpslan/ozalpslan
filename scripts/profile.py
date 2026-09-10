@@ -66,11 +66,35 @@ def header(theme: str, animated=True, width=840) -> str:
             frames.append("@keyframes " + name + "{" + "".join(f"{stop}{{fill:{color}}}" for stop, color in stops) + "}")
             frames.append(f".mark-{name}{{animation:{name} 3s ease-in-out infinite}}")
         animation = "<style>" + "\n".join(frames) + "\n@media(prefers-reduced-motion:reduce){.mark-outer,.mark-middle,.mark-inner{animation:none}}</style>"
-    content = f'''{animation}
-<g transform="translate({width/2-115} 16) scale(.49)">{''.join(pieces)}</g>
-{label(width/2, 239, 'Linux & DevOps', colors['text'], 16, 'middle', letter_spacing='1')}
-'''
-    return svg("GlassHouse · Linux & DevOps", "An unframed GH logo on a transparent background. The letters stay fixed and the arcs exchange colors every second in a three-second loop. Reduced motion shows the original colors.", content, 260, width)
+    compact = width < 600
+    scale = .205 if compact else .34
+    logo_x = width - (101 if compact else 168)
+    content = f'{animation}<g transform="translate({logo_x} 8) scale({scale})">{"".join(pieces)}</g>'
+    content += '<g font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif">'
+    content += label(0, 42, "Linux & DevOps", colors["text"], 32 if compact else 34, font_weight="650")
+    if compact:
+        lines = [
+            (78, "From hands-on labs", 19, "text"),
+            (102, "to reliable systems.", 19, "text"),
+            (148, "I build Linux and Kubernetes environments,", 17, "muted"),
+            (173, "automate infrastructure, and connect CI/CD,", 17, "muted"),
+            (198, "GitOps, and observability.", 17, "muted"),
+            (244, "Platforms Intern @ GlassHouse", 15, "text"),
+            (268, "Istanbul, Türkiye", 14, "muted"),
+        ]
+    else:
+        lines = [
+            (79, "From hands-on labs to reliable systems.", 19, "text"),
+            (125, "I build Linux and Kubernetes environments, automate infrastructure,", 16, "muted"),
+            (150, "and connect CI/CD, GitOps, and observability.", 16, "muted"),
+            (196, "Platforms Intern @ GlassHouse · Istanbul, Türkiye", 14, "muted"),
+        ]
+    content += "".join(label(0, y, text, colors[color], size) for y, text, size, color in lines) + "</g>"
+    description = ("Linux & DevOps. From hands-on labs to reliable systems. "
+                   "I build Linux and Kubernetes environments, automate infrastructure, and connect CI/CD, GitOps, and observability. "
+                   "Platforms Intern at GlassHouse, Istanbul, Türkiye. "
+                   "A small GH logo sits at the upper right. Its arcs exchange colors every second in a three-second loop; reduced motion keeps them still.")
+    return svg("GlassHouse · Linux & DevOps", description, content, 284 if compact else 216, width)
 
 
 def normalize_days(entries):

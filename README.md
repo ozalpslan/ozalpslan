@@ -1,4 +1,4 @@
-<p align="center">
+<p>
 <picture>
   <source media="(max-width: 600px) and (prefers-color-scheme: dark) and (prefers-reduced-motion: reduce)" srcset="assets/header-dark-compact-static.svg">
   <source media="(max-width: 600px) and (prefers-reduced-motion: reduce)" srcset="assets/header-light-compact-static.svg">
@@ -7,21 +7,11 @@
   <source media="(prefers-color-scheme: dark) and (prefers-reduced-motion: reduce)" srcset="assets/header-dark-static.svg">
   <source media="(prefers-color-scheme: light) and (prefers-reduced-motion: reduce)" srcset="assets/header-light-static.svg">
   <source media="(prefers-color-scheme: dark)" srcset="assets/header-dark.svg">
-  <img src="assets/header-light.svg" width="840" alt="GlassHouse GH logo with cyan, magenta and yellow arcs exchanging colors. Linux & DevOps.">
+  <img src="assets/header-light.svg" width="840" alt="Linux & DevOps. From hands-on labs to reliable systems. I build Linux and Kubernetes environments, automate infrastructure, and connect CI/CD, GitOps, and observability. Platforms Intern at GlassHouse, Istanbul, Türkiye. A small animated GH logo sits at the upper right.">
 </picture>
 </p>
 
-<p align="center">
-  <strong>Linux & DevOps Platforms Intern @ GlassHouse</strong><br>
-  <sub>Istanbul, Türkiye</sub>
-</p>
-
-<p align="center">
-  I build reproducible Linux and Kubernetes environments and automate infrastructure.<br>
-  CI/CD, GitOps, practical observability, and clear documentation.
-</p>
-
-<p align="center">
+<p>
   <code>Linux</code> · <code>Kubernetes</code> · <code>Docker</code> · <code>Ansible</code> · <code>Terraform</code> · <code>Jenkins</code> · <code>Prometheus</code> · <code>Grafana</code>
 </p>
 
@@ -34,7 +24,7 @@
   </picture>
 </a>
 
-<p align="center">
+<p>
   <a href="https://www.linkedin.com/in/alper-ozarslan/">LinkedIn</a> &nbsp; / &nbsp;
   <a href="https://github.com/ozalpslan?tab=repositories">Repositories</a>
 </p>
