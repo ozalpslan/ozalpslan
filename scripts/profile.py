@@ -69,12 +69,18 @@ def header(theme: str, animated=True, width=840) -> str:
     compact = width < 600
     scale = .24 if compact else .40
     logo_x = width - (117 if compact else 196)
-    content = f'{animation}<g transform="translate({logo_x} 8) scale({scale})">{"".join(pieces)}</g>'
+    name_magenta = "#C00073" if theme == "light" else MAGENTA
+    content = f'''{animation}<defs>
+<linearGradient id="name-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+  <stop offset="0%" stop-color="{colors['line']}"/>
+  <stop offset="100%" stop-color="{name_magenta}"/>
+</linearGradient>
+</defs><g transform="translate({logo_x} 8) scale({scale})">{''.join(pieces)}</g>'''
     content += '<g font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif">'
-    content += label(0, 42, "Alper Özarslan", colors["text"], 32 if compact else 34, font_weight="650")
+    content += label(0, 42, "Alper Özarslan", "url(#name-gradient)", 32 if compact else 34, font_weight="650")
     if compact:
         lines = [
-            (78, "Linux & DevOps Platform Intern", 18, "text"),
+            (78, "Linux & DevOps Platform Intern", 18, "line"),
             (105, "GlassHouse · Istanbul, Türkiye", 14, "muted"),
             (151, "I work with Linux and Kubernetes.", 17, "text"),
             (179, "This is where I keep my labs,", 17, "muted"),
@@ -82,7 +88,7 @@ def header(theme: str, animated=True, width=840) -> str:
         ]
     else:
         lines = [
-            (79, "Linux & DevOps Platform Intern", 20, "text"),
+            (79, "Linux & DevOps Platform Intern", 20, "line"),
             (107, "GlassHouse · Istanbul, Türkiye", 14, "muted"),
             (153, "I work with Linux and Kubernetes.", 17, "text"),
             (180, "This is where I keep my labs, scripts, and notes.", 17, "muted"),

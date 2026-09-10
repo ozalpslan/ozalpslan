@@ -8,6 +8,8 @@ This repository is the source for `github.com/ozalpslan`'s profile README. It mu
 
 The unframed, transparent header places **Alper Özarslan**, the **Linux & DevOps Platform Intern** title and a short introduction on the left, with the GH logo at the upper right. The mobile version uses shorter text lines and a smaller mark. The toolbox, yearly graph and links align with the introduction below it. Introductory copy is generated in `header()` in `scripts/profile.py`; keep the README image's alternative text in sync when editing it.
 
+The name uses a static cyan-to-magenta gradient and the role uses cyan. Light-mode text uses darker shades (`#007EAD` and `#C00073`) for readability on white. The description stays neutral; yellow remains in the logo.
+
 The logo uses cyan `#00B2EF`, magenta `#ED0090` and yellow `#F8EE02`. Its letters and arc positions stay fixed. Each arc holds its color for 0.55 seconds, then transitions for 0.45 seconds. One cycle takes 3 seconds. Light, dark, animated and static headers are generated together. The README selects the static version for reduced-motion preferences.
 
 Build the artwork from its editable sources with Python 3.10 or later (no third-party runtime packages):
