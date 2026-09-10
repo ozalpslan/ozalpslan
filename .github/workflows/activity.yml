@@ -1,0 +1,43 @@
+name: Refresh profile activity
+
+on:
+  schedule:
+    - cron: '17 4 * * *'
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - scripts/profile.py
+      - .github/workflows/activity.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: profile-activity
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: main
+      - name: Verify generator
+        run: python3 -m unittest discover -s tests -v
+      - name: Fetch contributions and render charts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 scripts/profile.py refresh --username ozalpslan
+      - name: Commit changed activity artwork
+        run: |
+          git add assets/activity-*.svg assets/activity.json
+          if git diff --cached --quiet; then
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'chore: refresh profile activity'
+          git push origin HEAD:main
