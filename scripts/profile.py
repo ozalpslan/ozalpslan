@@ -11,7 +11,7 @@ import os
 from pathlib import Path
 import re
 import sys
-from datetime import date, datetime, time, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 from html import escape
 import urllib.error
 import urllib.request
@@ -23,8 +23,8 @@ ASSETS = ROOT / "assets"
 CYAN, MAGENTA, YELLOW = "#00B2EF", "#ED0090", "#F8EE02"
 FONT = "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace"
 THEMES = {
-    "light": dict(bg="#FFFFFF", bar="#F6F8FA", border="#D1D9E0", text="#1F2328", muted="#59636E", line="#007EAD"),
-    "dark": dict(bg="#0D1117", bar="#161B22", border="#30363D", text="#E6EDF3", muted="#919BA6", line=CYAN),
+    "light": dict(border="#D1D9E0", text="#1F2328", muted="#59636E", line="#007EAD"),
+    "dark": dict(border="#30363D", text="#E6EDF3", muted="#919BA6", line=CYAN),
 }
 ET.register_namespace("", "http://www.w3.org/2000/svg")
 
@@ -62,41 +62,19 @@ def header(theme: str, animated=True, width=840) -> str:
         frames = []
         for name, sequence in (("outer", [YELLOW, CYAN, MAGENTA]), ("middle", [CYAN, MAGENTA, YELLOW]), ("inner", [MAGENTA, YELLOW, CYAN])):
             a, b, c = sequence
-            stops = (("0%,26.666%", a), ("33.333%,60%", b), ("66.666%,93.333%", c), ("100%", a))
+            stops = (("0%,18.333%", a), ("33.333%,51.666%", b), ("66.666%,85%", c), ("100%", a))
             frames.append("@keyframes " + name + "{" + "".join(f"{stop}{{fill:{color}}}" for stop, color in stops) + "}")
-            frames.append(f".mark-{name}{{animation:{name} 12s ease-in-out infinite}}")
+            frames.append(f".mark-{name}{{animation:{name} 3s ease-in-out infinite}}")
         animation = "<style>" + "\n".join(frames) + "\n@media(prefers-reduced-motion:reduce){.mark-outer,.mark-middle,.mark-inner{animation:none}}</style>"
     content = f'''{animation}
-<defs>
-  <radialGradient id="cyan-glow"><stop stop-color="{CYAN}" stop-opacity=".08"/><stop offset="1" stop-color="{CYAN}" stop-opacity="0"/></radialGradient>
-  <radialGradient id="pink-glow"><stop stop-color="{MAGENTA}" stop-opacity=".06"/><stop offset="1" stop-color="{MAGENTA}" stop-opacity="0"/></radialGradient>
-  <clipPath id="frame"><rect x=".5" y=".5" width="{width-1}" height="319" rx="12"/></clipPath>
-</defs>
-<rect x=".5" y=".5" width="{width-1}" height="319" rx="12" fill="{colors['bg']}" stroke="{colors['border']}"/>
-<g clip-path="url(#frame)">
-  <rect x="1" y="1" width="{width-2}" height="42" fill="{colors['bar']}"/>
-  <ellipse cx="{width/2-50}" cy="170" rx="225" ry="135" fill="url(#cyan-glow)"/>
-  <ellipse cx="{width/2+95}" cy="165" rx="175" ry="130" fill="url(#pink-glow)"/>
-</g>
-<path d="M1 43H{width-1}" stroke="{colors['border']}"/>
-<circle cx="23" cy="22" r="4" fill="{CYAN}"/>
-<circle cx="39" cy="22" r="4" fill="{MAGENTA}"/>
-<circle cx="55" cy="22" r="4" fill="{YELLOW}"/>
-{label(width/2, 26, 'alper@devops: ~', colors['muted'], 12, 'middle')}
-{label(width-36, 26, 'bash', colors['muted'], 11, 'end')}
-<g transform="translate({width/2-115} 64) scale(.49)">{''.join(pieces)}</g>
-{label(width/2, 285, 'LINUX  /  KUBERNETES  /  GITOPS', colors['muted'], 12, 'middle', letter_spacing='1.5')}
+<g transform="translate({width/2-115} 16) scale(.49)">{''.join(pieces)}</g>
+{label(width/2, 239, 'Linux & DevOps', colors['text'], 16, 'middle', letter_spacing='1')}
 '''
-    return svg("GlassHouse · DevOps", "The original GH silhouette stays fixed. Its three colored arcs exchange colors every four seconds in a twelve-second loop. Reduced motion shows the original colors.", content, 320, width)
+    return svg("GlassHouse · Linux & DevOps", "An unframed GH logo on a transparent background. The letters stay fixed and the arcs exchange colors every second in a three-second loop. Reduced motion shows the original colors.", content, 260, width)
 
 
-def dates_ending(end: date):
-    return [end - timedelta(days=30 - index) for index in range(31)]
-
-
-def normalize_days(entries, end: date):
-    """Reject incomplete data instead of mistaking a failed response for zero activity."""
-    expected = dates_ending(end)
+def normalize_days(entries):
+    """Preserve GitHub's native year window, including partial calendar weeks."""
     mapped = {}
     for entry in entries:
         day = date.fromisoformat(entry["date"])
@@ -106,24 +84,46 @@ def normalize_days(entries, end: date):
         if day in mapped:
             raise ValueError(f"Duplicate contribution date: {day}")
         mapped[day] = count
-    if any(day not in mapped for day in expected):
-        raise ValueError("GitHub returned an incomplete 31-day contribution window")
+    if not 365 <= len(mapped) <= 373:
+        raise ValueError("GitHub returned an incomplete yearly contribution window")
+    expected = [min(mapped) + timedelta(days=i) for i in range(len(mapped))]
+    if expected[-1] != max(mapped):
+        raise ValueError("GitHub returned an incomplete yearly contribution window")
     return [{"date": day.isoformat(), "contributionCount": mapped[day]} for day in expected]
+
+
+def weekly_totals(days):
+    weeks = {}
+    for entry in days:
+        day = date.fromisoformat(entry["date"])
+        sunday = day - timedelta(days=(day.weekday() + 1) % 7)
+        week = weeks.setdefault(sunday, {"date": entry["date"], "end": entry["date"], "contributionCount": 0})
+        week["end"] = entry["date"]
+        week["contributionCount"] += entry["contributionCount"]
+    return list(weeks.values())
+
+
+def validated_calendar(data):
+    if data.get("period") != "last_year":
+        raise ValueError("Refresh the cached activity to GitHub's yearly calendar before building")
+    days = normalize_days(data["days"])
+    total = data["totalContributions"]
+    if type(total) is not int or total < 0 or total != sum(day["contributionCount"] for day in days):
+        raise ValueError("Calendar total does not match the daily contribution counts")
+    return days
 
 
 def fetch_activity(username: str, token: str, now: datetime):
     if not re.fullmatch(r"[A-Za-z0-9](?:[A-Za-z0-9-]{0,37}[A-Za-z0-9])?", username):
         raise ValueError("Invalid GitHub username")
-    end = now.date()
-    start = datetime.combine(end - timedelta(days=30), time.min, tzinfo=timezone.utc)
-    query = """query($login: String!, $from: DateTime!, $to: DateTime!) {
+    query = """query($login: String!) {
       user(login: $login) {
-        contributionsCollection(from: $from, to: $to) {
-          contributionCalendar { weeks { contributionDays { date contributionCount } } }
+        contributionsCollection {
+          contributionCalendar { totalContributions weeks { contributionDays { date contributionCount } } }
         }
       }
     }"""
-    payload = json.dumps({"query": query, "variables": {"login": username, "from": start.isoformat(), "to": now.isoformat()}}).encode()
+    payload = json.dumps({"query": query, "variables": {"login": username}}).encode()
     request = urllib.request.Request("https://api.github.com/graphql", data=payload, headers={
         "Authorization": f"Bearer {token}", "Content-Type": "application/json", "User-Agent": "ozalpslan-profile",
     })
@@ -131,46 +131,53 @@ def fetch_activity(username: str, token: str, now: datetime):
         body = json.load(response)
     if not isinstance(body, dict) or body.get("errors") or not (body.get("data") or {}).get("user"):
         raise ValueError("GitHub could not return contribution data; existing artwork was preserved")
-    weeks = body["data"]["user"]["contributionsCollection"]["contributionCalendar"]["weeks"]
-    days = normalize_days([day for week in weeks for day in week["contributionDays"]], end)
-    return {"username": username, "updated": now.isoformat(), "source": "GitHub GraphQL contributionCalendar", "days": days}
+    calendar = body["data"]["user"]["contributionsCollection"]["contributionCalendar"]
+    days = [day for week in calendar["weeks"] for day in week["contributionDays"]]
+    data = {"username": username, "updated": now.isoformat(), "source": "GitHub GraphQL contributionCalendar",
+            "period": "last_year", "totalContributions": calendar["totalContributions"], "days": days}
+    data["days"] = validated_calendar(data)
+    return data
 
 
 def activity(theme: str, data=None, width=840) -> str:
     colors = THEMES[theme]
-    content = f'<rect x=".5" y=".5" width="{width-1}" height="239" rx="12" fill="{colors["bg"]}" stroke="{colors["border"]}"/>'
-    content += label(25, 31, "GITHUB ACTIVITY", colors["text"], 12, letter_spacing="1")
+    content = ""
     if data is None:
-        content += label(width/2, 118, "Activity data pending first refresh", colors["muted"], 14, "middle")
-        content += label(width/2, 146, "Real daily GitHub contributions will appear here.", colors["muted"], 11, "middle")
+        content += label(width/2, 118, "Yearly contributions pending first refresh", colors["muted"], 13, "middle")
+        content += label(width/2, 146, "The same year window as the GitHub contribution calendar.", colors["muted"], 10, "middle")
         return svg("GitHub activity awaiting data", "No contribution data has been fetched yet. No sample or zero values are being presented as real activity.", content, 240, width)
     updated = datetime.fromisoformat(data["updated"])
-    days = normalize_days(data["days"], updated.date())
-    counts = [entry["contributionCount"] for entry in days]
-    total = sum(counts)
-    content += label(width-25, 31, f"{total:,} contributions / 31 days", colors["muted"], 12, "end")
+    days = validated_calendar(data)
+    weeks = weekly_totals(days)
+    counts = [entry["contributionCount"] for entry in weeks]
+    total = data["totalContributions"]
+    content += label(0, 22, f"{total:,} contributions in the last year", colors["text"], 15)
+    content += label(0, 44, "Weekly totals", colors["muted"], 11)
     maximum = max(counts)
     step = max(1, math.ceil(maximum / 3))
     ceiling = step * 3
-    x0, x1, y0, y1 = 54, width-33, 60, 173
+    x0, x1, y0, y1 = 32, width-16, 63, 173
     for index in range(4):
         value = step * index
         y = y1 - (y1 - y0) * value / ceiling
         content += f'<path d="M{x0} {y:.2f}H{x1}" stroke="{colors["border"]}" stroke-dasharray="2 5"/>'
         content += label(x0 - 12, round(y + 4, 2), value, colors["muted"], 11, "end")
-    points = [(x0 + (x1 - x0) * i / 30, y1 - (y1 - y0) * value / ceiling) for i, value in enumerate(counts)]
+    points = [(x0 + (x1 - x0) * i / (len(weeks)-1), y1 - (y1 - y0) * value / ceiling) for i, value in enumerate(counts)]
     path = "M" + " L".join(f"{x:.2f},{y:.2f}" for x, y in points)
     content += f'<path d="{path}" fill="none" stroke="{colors["line"]}" stroke-width="2.3" stroke-linejoin="round" stroke-linecap="round"/>'
-    for (x, y), entry in zip(points, days):
-        content += f'<circle cx="{x:.2f}" cy="{y:.2f}" r="2.8" fill="{MAGENTA}"><title>{entry["date"]}: {entry["contributionCount"]} contributions</title></circle>'
-    for i in ((0, 10, 20, 30) if width < 600 else (0, 7, 14, 21, 30)):
-        day = date.fromisoformat(days[i]["date"])
-        content += label(round(points[i][0], 2), 196, day.strftime("%b %d"), colors["muted"], 11, "middle")
+    for (x, y), entry in zip(points, weeks):
+        content += f'<circle cx="{x:.2f}" cy="{y:.2f}" r="1.9" fill="{MAGENTA}"><title>{entry["date"]} to {entry["end"]}: {entry["contributionCount"]} contributions</title></circle>'
+    intervals = 4 if width < 600 else 6
+    for i in sorted({round(n*(len(weeks)-1)/intervals) for n in range(intervals+1)}):
+        day = date.fromisoformat(weeks[i]["date"])
+        edge = i in (0, len(weeks)-1)
+        anchor = "start" if i == 0 else ("end" if i == len(weeks)-1 else "middle")
+        content += label(round(points[i][0], 2), 196, day.strftime("%b %y" if edge else "%b"), colors["muted"], 11, anchor)
     period = f"{days[0]['date']} — {days[-1]['date']}"
-    content += label(25, 224, period, colors["muted"], 10)
-    content += label(width-25, 224, f"Updated {updated.strftime('%b %d, %H:%M')} UTC", colors["muted"], 10, "end")
-    values = "; ".join(f"{entry['date']}: {entry['contributionCount']}" for entry in days)
-    return svg("GitHub contributions · last 31 days", f"{data['username']}. {total} contributions from {period}. Daily counts: {values}.", content, 240, width)
+    content += label(0, 224, period, colors["muted"], 10)
+    content += label(width, 224, f"Updated {updated.strftime('%b %d, %H:%M')} UTC", colors["muted"], 10, "end")
+    values = "; ".join(f"{entry['date']} to {entry['end']}: {entry['contributionCount']}" for entry in weeks)
+    return svg("GitHub contributions · last year", f"{data['username']}. {total} contributions from {period}, using GitHub's native calendar window. Weekly totals: {values}.", content, 240, width)
 
 
 def write_outputs(outputs):

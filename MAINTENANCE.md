@@ -6,7 +6,7 @@ This repository is the source for `github.com/ozalpslan`'s profile README. It mu
 
 `assets/glasshouse-mark.svg` preserves the silhouette of the GlassHouse logo supplied for this profile. The brand artwork belongs to GlassHouse. The README identifies this as Alper's personal profile and states his internship role.
 
-The header uses cyan `#00B2EF`, magenta `#ED0090` and yellow `#F8EE02`. Its letters and arc positions stay fixed. Each arc holds its color for 3.2 seconds, then transitions for 0.8 seconds. One cycle takes 12 seconds. Light, dark, animated and static headers are generated together. The README selects the static version for reduced-motion preferences.
+The unframed, transparent header uses cyan `#00B2EF`, magenta `#ED0090` and yellow `#F8EE02`, with the caption **Linux & DevOps**. Its letters and arc positions stay fixed. Each arc holds its color for 0.55 seconds, then transitions for 0.45 seconds. One cycle takes 3 seconds. Light, dark, animated and static headers are generated together. The README selects the static version for reduced-motion preferences.
 
 Build the artwork from its editable sources with Python 3.10 or later (no third-party runtime packages):
 
@@ -17,7 +17,9 @@ python3 -m unittest discover -s tests -v
 
 ## Activity data
 
-The workflow refreshes the last 31 calendar days, including the current UTC day, at approximately 04:17 UTC daily. GitHub may delay scheduled runs. Counts represent contributions, not only commits. Only data accessible to the repository's built-in `GITHUB_TOKEN` is requested; private repository details are never requested or stored.
+The workflow refreshes GitHub's default **contributions in the last year** calendar at approximately 04:17 UTC daily. GitHub may delay scheduled runs. The API chooses the same window as the native calendar, including its partial weeks; the script does not substitute a fixed 31-day or 365-day range. The heading uses `totalContributions` and verifies it equals the sum of every returned daily count. The line groups those days into Sunday-starting weeks without dropping or double-counting contributions.
+
+Counts represent contributions, not only commits. The account's **Private contributions** setting must be enabled to include anonymous private contribution counts in the public chart using the built-in `GITHUB_TOKEN`. The owner has approved sharing these counts. Only dates and counts are requested and stored; private repository names and contents remain private. Turning this setting off will make future charts follow the smaller public total.
 
 The workflow also runs on its initial publication, generator/workflow updates and manual dispatch. It uses the built-in token with `contents: write` to save the chart and its dated source data. Its updates are authored by `github-actions[bot]` and do not create artificial user contributions. No personal token, external chart host or separate deployment is required.
 
@@ -27,7 +29,7 @@ For a local live refresh, provide `GH_TOKEN` or `GITHUB_TOKEN` through the envir
 python3 scripts/profile.py refresh --username ozalpslan
 ```
 
-Missing credentials, API errors, malformed responses and incomplete date ranges fail the refresh before changing the existing charts. The last successful data and visible refresh timestamp remain available. Before the first successful fetch, the chart explicitly displays a pending state. A cached initial snapshot can also come from the user's public GitHub contribution calendar; its provenance is recorded in `assets/activity.json`.
+Missing credentials, API errors, malformed responses, incomplete yearly date ranges and inconsistent totals fail the refresh before changing the existing charts. The last successful data and visible refresh timestamp remain available. Old 31-day caches are rejected rather than displayed under a yearly heading. Before the first successful fetch, the chart explicitly displays a pending state. The source is recorded in `assets/activity.json`.
 
 GitHub disables scheduled workflows in public repositories after 60 days without repository activity. If refreshing stops, check the Actions tab, re-enable the workflow if necessary and run it manually. A failing run remains visible in Actions; the graph's date range exposes stale data.
 
