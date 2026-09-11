@@ -69,15 +69,9 @@ def header(theme: str, animated=True, width=840) -> str:
     compact = width < 600
     scale = .24 if compact else .40
     logo_x = width - (117 if compact else 196)
-    name_magenta = "#C00073" if theme == "light" else MAGENTA
-    content = f'''{animation}<defs>
-<linearGradient id="name-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-  <stop offset="0%" stop-color="{colors['line']}"/>
-  <stop offset="100%" stop-color="{name_magenta}"/>
-</linearGradient>
-</defs><g transform="translate({logo_x} 8) scale({scale})">{''.join(pieces)}</g>'''
+    content = f'{animation}<g transform="translate({logo_x} 8) scale({scale})">{"".join(pieces)}</g>'
     content += '<g font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif">'
-    content += label(0, 42, "Alper Özarslan", "url(#name-gradient)", 32 if compact else 34, font_weight="650")
+    content += label(0, 42, "Alper Özarslan", colors["line"], 32 if compact else 34, font_weight="650")
     if compact:
         lines = [
             (78, "Linux & DevOps Platform Intern", 18, "line"),
