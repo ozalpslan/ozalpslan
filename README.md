@@ -12,7 +12,7 @@
 </p>
 
 <p>
-  <code>Linux</code> · <code>Kubernetes</code> · <code>Docker</code> · <code>Ansible</code> · <code>Terraform</code> · <code>Jenkins</code> · <code>Prometheus</code> · <code>Grafana</code>
+  <code>Linux</code> · <code>Kubernetes</code> · <code>Docker</code> · <code>Ansible</code> · <code>Terraform</code> · <code>Jenkins</code>
 </p>
 
 <a href="https://github.com/ozalpslan?tab=overview">
